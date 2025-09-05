@@ -1,6 +1,7 @@
 import PrivacyBadge from './PrivacyBadge'
 import SensitiveContentBlur from './SensitiveContentBlur'
 import ReactionBar from './ReactionBar'
+import SaveButton from './SaveButton'
 
 export default function StoryCard({ story }: { story: any }) {
   const authorName = story.is_anonymous ? 'Anonymous' : story.author?.display_name || '—'
@@ -8,7 +9,10 @@ export default function StoryCard({ story }: { story: any }) {
     <article className="rounded-xl border border-outline bg-white p-4 shadow-sm">
       <header className="mb-2 flex items-center justify-between">
         <div className="text-sm text-text/80">{authorName}</div>
-        <PrivacyBadge privacy={story.privacy} />
+        <div className="flex items-center gap-2">
+          <PrivacyBadge privacy={story.privacy} />
+          <SaveButton storyId={story.id} />
+        </div>
       </header>
       {story.sensitive ? (
         <SensitiveContentBlur>
