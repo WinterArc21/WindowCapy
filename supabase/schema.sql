@@ -1,0 +1,1 @@
+-- Consolidated schema snapshot. Apply supabase/migrations/000_init.sql to create objects.
