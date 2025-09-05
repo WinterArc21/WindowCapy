@@ -1,0 +1,24 @@
+:root {
+  --color-primary: #D6BFA8;
+  --color-secondary: #F9F5F2;
+  --color-tertiary: #F6CAC9;
+  --color-error: #E57373;
+  --color-success: #81C784;
+  --color-warning: #F6C66B;
+  --color-info: #90CAF9;
+  --color-text: #2F2F2F;
+  --color-outline: #E3DED8;
+  --color-bg: #FFFFFF;
+
+  --bg-error: #FCEEEE;
+  --bg-warning: #FFF8E6;
+  --bg-success: #F0FAF2;
+  --bg-muted: #F9F5F2;
+  --bg-info: #EEF6FC;
+
+  --ring-primary: #D6BFA8;
+  --ring-info: #90CAF9;
+  --ring-error: #E57373;
+}
+
+* { outline-color: var(--ring-primary); }
