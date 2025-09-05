@@ -1,6 +1,7 @@
 import { supabaseServer } from '@/lib/supabase-server'
 import StoryCard from '@/components/story/StoryCard'
 import { notFound } from 'next/navigation'
+import CommentThread from '@/components/story/CommentThread'
 
 export default async function StoryDetail({ params }: { params: { id: string } }) {
   const supabase = supabaseServer()
@@ -12,8 +13,9 @@ export default async function StoryDetail({ params }: { params: { id: string } }
     .single()
   if (!data) return notFound()
   return (
-    <main className="mx-auto max-w-2xl p-4">
+    <main className="mx-auto max-w-2xl p-4 space-y-4">
       <StoryCard story={data as any} />
+      <CommentThread storyId={params.id} />
     </main>
   )
 }
