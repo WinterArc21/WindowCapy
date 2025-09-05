@@ -1,5 +1,6 @@
 import PrivacyBadge from './PrivacyBadge'
 import SensitiveContentBlur from './SensitiveContentBlur'
+import ReactionBar from './ReactionBar'
 
 export default function StoryCard({ story }: { story: any }) {
   const authorName = story.is_anonymous ? 'Anonymous' : story.author?.display_name || '—'
@@ -22,6 +23,7 @@ export default function StoryCard({ story }: { story: any }) {
       {story.audio_url ? (
         <audio className="mt-3 w-full" controls src={story.audio_url} />
       ) : null}
+      <ReactionBar storyId={story.id} />
     </article>
   )
 }
