@@ -3,7 +3,6 @@ import { useState, useRef } from 'react'
 import Button from '@/components/ui/Button'
 import { Textarea, Input } from '@/components/ui/Inputs'
 import { uploadImage, uploadAudio } from '@/lib/storage'
-import { supabaseBrowser } from '@/lib/supabase-browser'
 import { checkBlockedWords } from '@/lib/blocklist'
 
 export default function ComposeForm() {
@@ -44,8 +43,6 @@ export default function ComposeForm() {
     }
     setSubmitting(true)
     try {
-      const supabase = supabaseBrowser()
-      if (!supabase) throw new Error('Supabase not configured')
       let image_url: string | null = null
       let audio_url: string | null = null
       if (imageFile) image_url = await uploadImage(imageFile)
@@ -53,16 +50,15 @@ export default function ComposeForm() {
         const file = new File([audioBlob], 'diary.webm', { type: 'audio/webm' })
         audio_url = await uploadAudio(file)
       }
-      const { error: insertError } = await supabase.from('stories').insert({
-        content,
-        image_url,
-        audio_url,
-        privacy,
-        is_anonymous: isAnonymous,
-        is_draft: isDraft,
-        sensitive,
+      const res = await fetch('/api/stories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, image_url, audio_url, privacy, is_anonymous: isAnonymous, is_draft: isDraft, sensitive }),
       })
-      if (insertError) throw insertError
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to save')
+      }
       setContent('')
       setImageFile(null)
       setAudioBlob(null)
