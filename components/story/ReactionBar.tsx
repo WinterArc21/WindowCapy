@@ -49,7 +49,7 @@ export default function ReactionBar({ storyId }: { storyId: string }) {
       {TYPES.map((t) => (
         <Tooltip key={t.key} text={t.label}>
           <button
-            onClick={() => toggle(t.key)}
+            onClick={() => toggle(t.key)} aria-label={`React: ${t.label}`}
             className={
               'rounded-full border border-outline px-2 py-1 text-xs ' +
               (mine.includes(t.key) ? 'bg-tertiary' : 'bg-secondary')
