@@ -1,6 +1,7 @@
 import { supabaseServer } from '@/lib/supabase-server'
 import FollowButton from '@/components/profile/FollowButton'
 import Avatar from '@/components/ui/Avatar'
+import ReportButton from '@/components/story/ReportButton'
 
 export default async function ProfilePage({ params }: { params: { username: string } }) {
   const supabase = supabaseServer()
@@ -28,9 +29,12 @@ export default async function ProfilePage({ params }: { params: { username: stri
           <h1 className="text-2xl font-semibold">{profile.display_name}</h1>
           <div className="text-sm text-text/70">@{profile.username}</div>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
           {!isSelf && (
-            <FollowButton targetId={profile.id} isFollowing={Boolean(isFollowingData)} />
+            <>
+              <FollowButton targetId={profile.id} isFollowing={Boolean(isFollowingData)} />
+              <ReportButton targetType="profile" targetId={profile.id} />
+            </>
           )}
         </div>
       </header>

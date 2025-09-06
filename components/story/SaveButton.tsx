@@ -14,7 +14,7 @@ export default function SaveButton({ storyId, name = 'Favorites' }: { storyId: s
     })
   }
   return (
-    <Button onClick={save} disabled={pending} variant="secondary">
+    <Button aria-label='Save story to Favorites' onClick={save} disabled={pending} variant="secondary">
       {pending ? 'Saving…' : 'Save'}
     </Button>
   )

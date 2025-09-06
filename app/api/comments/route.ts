@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
+import { checkBlockedWords } from '@/lib/blocklist'
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
@@ -23,6 +24,8 @@ export async function POST(req: Request) {
   const user = session?.session?.user
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { story_id, content, parent_id } = await req.json()
+  const blocked = checkBlockedWords(String(content || ''))
+  if (blocked.length) return NextResponse.json({ error: 'Blocked terms', blocked }, { status: 400 })
   const { error } = await supabase.from('comments').insert({ story_id, content, parent_id: parent_id || null, author_id: user.id })
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true })

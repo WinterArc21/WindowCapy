@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { Input, Textarea } from '@/components/ui/Inputs'
 import Button from '@/components/ui/Button'
+import ReportButton from '@/components/story/ReportButton'
+import { checkBlockedWords } from '@/lib/blocklist'
 
 function buildTree(items: any[]) {
   const map = new Map(items.map((i) => [i.id, { ...i, children: [] as any[] }]))
@@ -17,6 +19,7 @@ export default function CommentThread({ storyId }: { storyId: string }) {
   const [comments, setComments] = useState<any[]>([])
   const [content, setContent] = useState('')
   const [pending, start] = useTransition()
+  const [error, setError] = useState<string | null>(null)
 
   async function load() {
     const res = await fetch(`/api/comments?story_id=${storyId}`)
@@ -30,6 +33,12 @@ export default function CommentThread({ storyId }: { storyId: string }) {
 
   async function submit(parent_id?: string) {
     start(async () => {
+      setError(null)
+      const blocked = checkBlockedWords(content)
+      if (blocked.length) {
+        setError(`Contains blocked terms: ${blocked.join(', ')}`)
+        return
+      }
       const res = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -38,6 +47,9 @@ export default function CommentThread({ storyId }: { storyId: string }) {
       if (res.ok) {
         setContent('')
         await load()
+      } else {
+        const data = await res.json().catch(() => ({}))
+        setError(data.error || 'Failed to post')
       }
     })
   }
@@ -47,14 +59,16 @@ export default function CommentThread({ storyId }: { storyId: string }) {
   return (
     <section className="mt-4 space-y-2">
       <h2 className="text-sm font-medium">Comments</h2>
+      {error ? <div role="alert" className="rounded-md bg-bgError p-2 text-sm text-error">{error}</div> : null}
       <div className="flex gap-2">
         <Textarea
+          aria-label="Comment"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={2}
           placeholder="Write a comment…"
         />
-        <Button onClick={() => submit()} disabled={pending || !content.trim()}>
+        <Button aria-label="Post comment" onClick={() => submit()} disabled={pending || !content.trim()}>
           {pending ? 'Posting…' : 'Post'}
         </Button>
       </div>
@@ -70,7 +84,10 @@ export default function CommentThread({ storyId }: { storyId: string }) {
 function CommentItem({ comment, onReply }: { comment: any; onReply: (t: string) => void }) {
   return (
     <div className="rounded-lg border border-outline p-2">
-      <div className="text-sm">{comment.content}</div>
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-sm">{comment.content}</div>
+        <ReportButton targetType="comment" targetId={comment.id} />
+      </div>
       <div className="mt-1 text-xs text-text/60">{new Date(comment.created_at).toLocaleString()}</div>
       <div className="mt-2 pl-3">
         {comment.children?.map((child: any) => (

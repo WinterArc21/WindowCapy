@@ -3,6 +3,7 @@ import StoryCard from '@/components/story/StoryCard'
 import { notFound } from 'next/navigation'
 import CommentThread from '@/components/story/CommentThread'
 import ReportButton from '@/components/story/ReportButton'
+import { getAudioSignedUrl } from '@/lib/storage'
 
 export default async function StoryDetail({ params }: { params: { id: string } }) {
   const supabase = supabaseServer()
@@ -21,13 +22,17 @@ export default async function StoryDetail({ params }: { params: { id: string } }
     .eq('status', 'actioned')
     .maybeSingle()
   if (actioned) return notFound()
+
+  const signed = data.audio_url ? await getAudioSignedUrl(data.audio_url) : null
+  const story = { ...data, audio_url: signed }
+
   return (
     <main className="mx-auto max-w-2xl p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">Story</h1>
         <ReportButton targetType="story" targetId={params.id} />
       </div>
-      <StoryCard story={data as any} />
+      <StoryCard story={story as any} />
       <CommentThread storyId={params.id} />
     </main>
   )
